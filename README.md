@@ -41,7 +41,7 @@ Traditional mountaineers read physical indicators:
 ### 2. Installation
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/microcast.git
+git clone https://github.com/Sai-Adithya-M/microcast.git
 cd microcast
 
 # Create virtual environment
