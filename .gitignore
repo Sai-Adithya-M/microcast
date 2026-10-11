@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+static/audio/*.mp3
+!static/audio/.gitkeep

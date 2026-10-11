@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MicroCast — Offline Mountain Weather & Trail Safety</title>
+  <meta name="description" content="Offline mountain storm predictor powered by TabPFN. Built for trail safety and screen-free outdoor exploration.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Clean Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="logo-title">MicroCast</h1>
+        <span class="logo-desc">Offline Mountain Safety</span>
+      </div>
+      <div class="header-right">
+        <span class="status-pill"><span class="dot"></span> Offline Ready</span>
+        <span id="header-elevation" class="elevation-pill">2,400 m</span>
+      </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <main class="app-layout">
+      <!-- Left Column: Inputs (Photo & Sensors) -->
+      <section class="panel-left">
+        <!-- Photo Upload Card -->
+        <div class="card photo-card">
+          <div class="card-header">
+            <div>
+              <h2>Sky & Cloud Photo</h2>
+              <p class="card-caption">Take a photo of the horizon or upload an image to identify clouds automatically.</p>
+            </div>
+          </div>
+
+          <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden-input">
+
+          <div class="drop-area" id="drop-zone">
+            <div id="preview-box" class="preview-box hidden">
+              <img id="image-preview" src="" alt="Uploaded sky">
+              <button type="button" id="remove-photo-btn" class="btn-text-only" title="Remove photo">Change photo</button>
+            </div>
+
+            <div id="upload-placeholder" class="upload-placeholder">
+              <svg class="upload-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+              <span class="upload-cta">Tap to take photo or choose file</span>
+              <span class="upload-hint">Works offline • JPG or PNG</span>
+            </div>
+          </div>
+
+          <!-- Quick Test Samples -->
+          <div class="sample-row">
+            <span class="sample-label">Or test with a sample:</span>
+            <div class="sample-buttons">
+              <button type="button" class="btn-sample" data-sample="clear">Clear Blue Sky</button>
+              <button type="button" class="btn-sample" data-sample="wave">Mountain Wave</button>
+              <button type="button" class="btn-sample" data-sample="anvil">Storm Clouds</button>
+            </div>
+          </div>
+
+          <!-- Vision Feedback -->
+          <div id="vision-badge" class="vision-feedback hidden">
+            <div class="vision-indicator"></div>
+            <div class="vision-text">
+              <strong id="vision-title">Storm Clouds Detected</strong>
+              <span id="vision-subtitle">Identified with 94% confidence. Applied to storm forecast.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sensor Readings Card -->
+        <div class="card telemetry-card">
+          <div class="card-header">
+            <div>
+              <h2>Trail Conditions & Barometer</h2>
+              <p class="card-caption">Air pressure changes are the #1 physical indicator of incoming mountain storms.</p>
+            </div>
+          </div>
+
+          <!-- Presets -->
+          <div class="presets-container">
+            <span class="presets-label">Quick Scenarios:</span>
+            <div class="preset-pill-group">
+              <button type="button" class="preset-pill active" data-preset="calm">Calm Hike</button>
+              <button type="button" class="preset-pill" data-preset="wave">Passing Front</button>
+              <button type="button" class="preset-pill alert" data-preset="squall">Incoming Squall</button>
+            </div>
+          </div>
+
+          <!-- Inputs -->
+          <div class="sliders-list">
+            <!-- Pressure Drop -->
+            <div class="slider-field highlight-field">
+              <div class="field-label-row">
+                <label for="pressure-drop">Pressure Drop (Last Hour)</label>
+                <span id="val-pressure" class="field-value">1.8 hPa/hr</span>
+              </div>
+              <input type="range" id="pressure-drop" min="0.0" max="4.0" step="0.1" value="1.8">
+              <div class="field-subtext">
+                <span>0.0 (Normal)</span>
+                <span>1.5+ (Storm Alert)</span>
+                <span>3.0+ (Severe)</span>
+              </div>
+            </div>
+
+            <!-- Altitude & Temp -->
+            <div class="two-col-grid">
+              <div class="slider-field">
+                <div class="field-label-row">
+                  <label for="altitude">Altitude</label>
+                  <span id="val-altitude" class="field-value">2,400 m</span>
+                </div>
+                <input type="range" id="altitude" min="800" max="4000" step="50" value="2400">
+              </div>
+
+              <div class="slider-field">
+                <div class="field-label-row">
+                  <label for="temperature">Temperature</label>
+                  <span id="val-temp" class="field-value">11.5 °C</span>
+                </div>
+                <input type="range" id="temperature" min="-5" max="30" step="0.5" value="11.5">
+              </div>
+            </div>
+
+            <!-- Humidity & Wind -->
+            <div class="two-col-grid">
+              <div class="slider-field">
+                <div class="field-label-row">
+                  <label for="humidity">Humidity</label>
+                  <span id="val-humidity" class="field-value">82%</span>
+                </div>
+                <input type="range" id="humidity" min="20" max="100" step="1" value="82">
+              </div>
+
+              <div class="slider-field">
+                <div class="field-label-row">
+                  <label for="wind">Ridge Wind Speed</label>
+                  <span id="val-wind" class="field-value">38 km/h</span>
+                </div>
+                <input type="range" id="wind" min="0" max="80" step="2" value="38">
+              </div>
+            </div>
+
+            <!-- Cloud Type Pills (if not using photo) -->
+            <div class="cloud-pill-section">
+              <label class="cloud-picker-title">Cloud Formation (Manual Override):</label>
+              <div class="cloud-pills">
+                <button type="button" class="cloud-btn" data-code="0">Cirrus (Thin)</button>
+                <button type="button" class="cloud-btn" data-code="1">Cumulus (Fair)</button>
+                <button type="button" class="cloud-btn" data-code="2">Lenticular (Wave)</button>
+                <button type="button" class="cloud-btn active" data-code="3">Towering Cloud</button>
+                <button type="button" class="cloud-btn alert-cloud" data-code="4">Storm Anvil</button>
+              </div>
+            </div>
+          </div>
+
+          <button type="button" id="scan-btn" class="btn-primary">
+            Run Forecast Scan
+          </button>
+        </div>
+      </section>
+
+      <!-- Right Column: Results & Audio Action -->
+      <section class="panel-right">
+        <!-- Main Assessment Card -->
+        <div class="card result-card">
+          <div class="card-header">
+            <h2>Trail Forecast</h2>
+            <span class="model-tag">Prior Labs TabPFN</span>
+          </div>
+
+          <!-- Risk Score Bar -->
+          <div class="risk-overview">
+            <div class="risk-number-row">
+              <span id="risk-display-number" class="big-risk">88%</span>
+              <div class="risk-meta">
+                <span class="meta-label">Squall Probability</span>
+                <span id="severity-pill" class="pill-severity danger">Storm Warning</span>
+              </div>
+            </div>
+
+            <!-- Clean Progress Bar -->
+            <div class="risk-bar-track">
+              <div id="risk-bar-fill" class="risk-bar-fill danger" style="width: 88%;"></div>
+            </div>
+
+            <div class="eta-row">
+              <span class="eta-label">Estimated Storm Onset:</span>
+              <strong id="eta-time" class="eta-value">30 – 60 minutes</strong>
+            </div>
+          </div>
+
+          <!-- Safety Recommendation -->
+          <div class="advice-block">
+            <h3>Trail Recommendation</h3>
+            <p id="advice-text">
+              Severe mountain squall imminent within 45 to 90 minutes. Do not attempt exposed ridge summits. Descend below tree line immediately.
+            </p>
+          </div>
+
+          <!-- Hands-Free Audio Action -->
+          <div class="audio-box">
+            <div class="audio-copy">
+              <strong>Hands-Free Audio Alert</strong>
+              <p>Listen via earbuds so you can put your phone in your pocket.</p>
+            </div>
+            <button type="button" id="play-audio-btn" class="btn-audio">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              <span id="audio-label">Listen to Alert</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Practical Information Card -->
+        <div class="card info-card">
+          <h3>Why Open AI Matters on Trails</h3>
+          <p>
+            National parks and mountain passes have zero cellular coverage. Standard AI assistants (ChatGPT, Claude) fail completely without cloud servers. 
+          </p>
+          <p>
+            MicroCast runs <strong>Prior Labs' TabPFN</strong> foundation model locally on the device in 0.1 seconds without internet, giving hikers reliable, private safety decisions off the grid.
+          </p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
